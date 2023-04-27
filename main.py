@@ -1,11 +1,14 @@
 import logging
+import os
 
+from dotenv import load_dotenv
 import discord
 import yt_dlp
 
 # import os
 # os.environ['FFMPEG_PATH'] = 'C:/ProgramData/chocolatey/bin/ffmpeg.exe'
-
+load_dotenv()
+TOKEN=os.getenv('TOKEN')
 intents = discord.Intents.all()
 # create a Discord client
 client = discord.Client(command_prefix="!", intents=intents)
@@ -96,4 +99,4 @@ async def on_message(message):
 
 
 # run the client
-client.run("MTEwMDc4OTU2MTU4OTc2NDE3OA.GafM25.Paw3mlKPydmeYWSMDeHk6NrUfpL_TgyvttZ_Ss", log_level=logging.DEBUG)
+client.run(TOKEN, log_level=logging.DEBUG)
