@@ -37,6 +37,8 @@ async def play_song(ctx, info_dict):
     if song_url is not None:
         voice_client.play(discord.FFmpegPCMAudio(song_url, options='-vn'),
                           after=lambda e: print('Player error: %s' % e) if e else None)
+        song_title = info_dict.get('title', 'Unknown Title')
+        await ctx.channel.send(f'Now playing: {song_title}')
     else:
         print(f'Didn`t find a song for {song_url}')
     voice_client.source = discord.PCMVolumeTransformer(voice_client.source, 1)
@@ -47,8 +49,24 @@ async def handle_command(ctx, cmd):
     if cmd.startswith('!play'):
         url = cmd.split()[1]
         info_dict = get_song_info(url)
+        song_title = info_dict.get('title', 'Unknown Title')
 
-        await play_song(ctx, info_dict)
+        if songs:
+            songs[url] = info_dict
+            queue_position = len(songs)
+            await ctx.channel.send(f'{song_title} added to queue at position {queue_position}')
+        else:
+            songs[url] = info_dict
+            await play_song(ctx, info_dict)
+            await ctx.channel.send(f'Now playing: {song_title}')
+    elif cmd.startswith('!queue'):
+        if songs:
+            queue = ""
+            for i, song in enumerate(songs.values(), 1):
+                queue += f'{i}. {song.get("title", "Unknown Title")}\n'
+            await ctx.channel.send(f'Playback Queue:\n{queue}')
+        else:
+            await ctx.channel.send('Playback queue is empty.')
 
 
 @client.event
